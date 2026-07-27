@@ -1,7 +1,9 @@
 --[=[
     SaveInstance Library (Integrated Edition)
-    With Progress Bar Integration
+    Optimized to prevent freezing
 ]=]
+
+local RunService = game:GetService("RunService")
 
 -- UI Helper: Create a simple drawing bar
 local function CreateProgressBar()
@@ -58,24 +60,26 @@ local function StreamMap(bar)
     local Radius = 1024
     local Size = 5000 
     
-    local xSteps = #{-Size, Size, Radius} -- Rough estimate for progress calculation
-    local totalSteps = 25 -- Number of iterations in loop
-    local currentStep = 0
-    
+    -- Calculate steps for progress bar
+    local steps = {}
     for x = -Size, Size, Radius do
         for z = -Size, Size, Radius do
-            currentStep += 1
-            local Pos = Vector3.new(x, Origin.Y, z)
-            LocalPlayer:RequestStreamAroundAsync(Pos, 20)
-            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(Pos)
-            
-            -- Update Progress Bar
-            if bar then
-                bar.Size = Vector2.new((currentStep / totalSteps) * 400, 20)
-            end
-            
-            task.wait(0.3)
+            table.insert(steps, Vector3.new(x, Origin.Y, z))
         end
+    end
+    
+    local totalSteps = #steps
+    
+    for i, Pos in ipairs(steps) do
+        LocalPlayer:RequestStreamAroundAsync(Pos, 20)
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(Pos)
+        
+        if bar then
+            bar.Size = Vector2.new((i / totalSteps) * 400, 20)
+        end
+        
+        -- Crucial: Wait to allow rendering
+        task.wait(0.4) 
     end
     LocalPlayer.Character.HumanoidRootPart.CFrame = Origin
 end
@@ -86,18 +90,22 @@ return function(Options)
     local bar = CreateProgressBar()
     bar.Visible = true
     
-    -- 1. Prepass
+    -- 1. Prepass (Optimized)
     if Options.DecompilePrepass then
         print("[SaveInstance] Running optimized prepass...")
         local Cache = {}
         local UniqueScripts = {}
-        for _, o in next, game:GetDescendants() do
+        
+        -- Collect scripts in small chunks to prevent freeze
+        local allDescendants = game:GetDescendants()
+        for i, o in ipairs(allDescendants) do
             if o:IsA("LuaSourceContainer") then
                 local Ok, Bc = pcall(getscriptbytecode, o)
                 if Ok and type(Bc) == "string" and Bc ~= "" and not UniqueScripts[Bc] then
                     UniqueScripts[Bc] = true
                 end
             end
+            if i % 500 == 0 then task.wait() end -- Yield every 500 scripts
         end
 
         local MaxConcurrent = 5
@@ -110,7 +118,6 @@ return function(Options)
             while InFlight >= MaxConcurrent do task.wait(0.1) end
             InFlight += 1
             
-            -- Update Bar
             bar.Size = Vector2.new((i / totalScripts) * 400, 20)
             
             task.spawn(function()
