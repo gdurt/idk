@@ -10,11 +10,11 @@ local function CreateProgressBar()
     return bar
 end
 
-local service = game:GetService("Players")
+local Players = game:GetService("Players")
 
 -- Streaming Logic
 local function StreamMap(bar)
-    local LocalPlayer = service.LocalPlayer
+local LocalPlayer = Players.LocalPlayer
     if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
     local Origin = LocalPlayer.Character.HumanoidRootPart.CFrame
     local Radius = 1024
