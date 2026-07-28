@@ -3911,11 +3911,11 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 
 	local function save_game()
 	    local bar = CreateProgressBar()
-		bar.Visible = true
-		StreamMap(bar)
-		bar:Remove()
-		do
-			if IsModel then
+ 		bar.Visible = true
+ 		StreamMap(bar)
+ 		bar:Remove()
+ 		do
+ 			if IsModel then
 				--[[
 			-- ? Roblox encodes the following additional attributes. These are not required. Moreover, any defined schemas are ignored, and not required for a file to be valid: xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd"
 			Also http can be converted to https but not sure if Roblox cares
