@@ -14,7 +14,7 @@ local service = game:GetService("Players")
 
 -- Streaming Logic
 local function StreamMap(bar)
-    local LocalPlayer = service.Players.LocalPlayer
+    local LocalPlayer = service.LocalPlayer
     if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
     local Origin = LocalPlayer.Character.HumanoidRootPart.CFrame
     local Radius = 1024
