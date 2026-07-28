@@ -10,6 +10,8 @@ local function CreateProgressBar()
     return bar
 end
 
+local service = game:GetService("Players")
+
 -- Streaming Logic
 local function StreamMap(bar)
     local LocalPlayer = service.Players.LocalPlayer
